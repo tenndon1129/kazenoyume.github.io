@@ -1,0 +1,142 @@
+<html>
+  <title>風邪のときに見た意味不明な夢の再現</title>
+  <head>
+    <meta charset="utf-8" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.167.0/build/three.module.js",
+          "OrbitControls":"./three.js-dev/examples/jsm/controls/OrbitControls.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script src="./js/platform.js"></script>
+    
+    <script type="module">
+      import * as THREE from "three";
+      import { GLTFLoader } from"three/addons/loaders/GLTFLoader.js";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+
+      // サイズを指定
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // レンダラーを作成
+      const canvas = document.getElementById('canvas')
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+      renderer.setSize(width, height);
+
+      renderer.shadowMap.enabled = true;
+
+      // シーンを作成
+      const scene = new THREE.Scene();
+
+      // カメラを作成
+      const camera = new THREE.PerspectiveCamera(70, width / height, 10, 3000);
+      camera.position.set(0, 0, 90);
+      camera.lookAt(0, 0, 0);
+
+
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1); // 環境光（明るさ0.5）
+      scene.add(ambientLight);
+
+
+      //light
+      const light = new THREE.PointLight(0xffffff, 1500, 50);
+      light.position.set(5, 20, 5);
+      light.castShadow = true;
+      scene.add(light);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+
+      // GLTF形式のモデルデータを読み込む
+      const loader = new GLTFLoader();
+      // GLTFファイルのパスを指定
+      const gltf = await loader.loadAsync('./rubber_duck_toy/rubber_duck_toy_1k.gltf');
+      // 読み込み後に3D空間に追加
+      const model = gltf.scene;
+      model.castshadow=true;
+      scene.add(model);
+      model.scale.set(1,1,1);
+
+      // 床を作成
+      const meshFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 0.1, 2),
+      new THREE.MeshStandardMaterial());
+      meshFloor.receiveShadow = true;
+      scene.add(meshFloor);
+
+      tick();
+
+      // 毎フレーム時に実行されるループイベントです
+      function tick() {
+        renderer.render(scene, camera); // レンダリング
+        requestAnimationFrame(tick);
+
+        model.scale.x += 0.05;
+        model.scale.y += 0.05;
+        model.scale.z += 0.05;
+
+      }
+
+      window.addEventListener('click', (evt) => {
+      const raycaster = new THREE.Raycaster();
+      const vector = new THREE.Vector2(
+      (evt.clientX / window.innerWidth) * 2 - 1,
+      (evt.clientY / window.innerHeight) * -2 + 1
+      );
+
+      raycaster.setFromCamera(vector, camera);
+
+      const intersects = raycaster.intersectObjects(scene.children);
+
+      if (intersects.length) {
+      if (intersects[0].object.log) {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => intersects[0].object.log(''), 100);
+        intersects[0].object.log('click');
+        }
+      }
+      });
+    </script>
+
+    <script>
+      
+
+      window.onload = function getdeta(){
+        var width = screen.width || N/A;
+        var height = screen.height|| N/A;
+        var lang = window.navigator.language|| N/A;
+        var user = navigator.userAgent|| N/A;
+        var referrer = window.document.referrer|| N/A;
+        var browser = platform.name|| N/A;
+        var os = platform.os.toString|| N/A;
+
+        var URL ="https://script.google.com/macros/s/AKfycbzZubd5kXo1Mc-i2jSmgmSzMyeGkWXxtwTpRKWozRkD-6_GybBrqRhd-vtt3av9uihWfw/exec";
+
+        fetch(URL,{
+          method:"POST",
+          mode: "no-cors", 
+          headers:{
+            "content-Type":"application/json"
+          },
+          body:JSON.stringify({
+          width:width,
+          height:height,
+          lang:lang,
+          user:user,
+          referrer:referrer,
+          browser:browser,
+          os:os
+          })
+        });
+      }
+    </script>
+  <body>
+    <canvas id="canvas"></canvas>
+  </body>
+</html>
